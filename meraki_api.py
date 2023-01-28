@@ -1,6 +1,5 @@
 import requests
 import json
-from os import environ
 
 base_url = "https://api.meraki.com"
 base_api = "{base_url}/api/v1".format(base_url=base_url)
@@ -54,4 +53,12 @@ def do_request(method: str,
             print(f"{ret.text}")
             print("--- done ---")
         return []
+
+def meraki_put_ssid(network_id, ssid_number, data):
+    api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
+    return do_request("PUT", api_epr, data)
+
+def meraki_get_ssid(network_id, ssid_number):
+    api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
+    return do_request("GET", api_epr)
 

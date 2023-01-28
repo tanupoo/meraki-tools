@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from util import do_request
+from meraki_api import meraki_put_ssid, meraki_get_ssid
 import json
 import argparse
 from os import environ
@@ -8,14 +8,6 @@ from os import environ
 """
 ssid_switch.py -c config.json -k file:meraki-apikey.txt
 """
-
-def put_ssid(network_id, ssid_number, data):
-    api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-    return do_request("PUT", api_epr, data)
-
-def get_ssid(network_id, ssid_number):
-    api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-    return do_request("GET", api_epr)
 
 def print_ssid_status(result):
     if result:
@@ -25,7 +17,7 @@ def print_ssid_status(result):
         print(result)
 
 def get_ssid_status(ssid_name, target):
-    ret = get_ssid(target["network_id"], target["ssid_number"])
+    ret = meraki_get_ssid(target["network_id"], target["ssid_number"])
     print_ssid_status(ret)
 
 def update_ssid_status(ssid_name, target, status):
@@ -35,7 +27,7 @@ def update_ssid_status(ssid_name, target, status):
         data = { "enabled": False }
     else:
         raise RuntimeError
-    ret = put_ssid(target["network_id"], target["ssid_number"], data)
+    ret = meraki_put_ssid(target["network_id"], target["ssid_number"], data)
     print_ssid_status(ret)
 
 def set_required_values():
