@@ -6,7 +6,7 @@ import argparse
 from os import environ
 
 """
-ssid_switch.py -c config.json -k FILE:meraki-apikey.txt
+ssid_switch.py -c config.json -k file:meraki-apikey.txt
 """
 
 def put_ssid(network_id, ssid_number, data):
@@ -49,6 +49,8 @@ def set_required_values():
         raise ValueError("API key must be specified.")
     elif opt.api_key.startswith("key:"):
         api_key = opt.api_key[len("key:"):]
+    elif opt.api_key.startswith("file:"):
+        api_key = open(opt.api_key[len("file:"):]).read().strip()
     elif opt.api_key:
         api_key = open(opt.api_key).read().strip()
     environ["MERAKI_API_KEY"] = api_key
@@ -67,7 +69,7 @@ ap.add_argument("-u", "--update-status", action="store", dest="status",
 ap.add_argument("-a", "--show-all-status", action="store_true", dest="show_all_status",
                 help=f"show current status of all APs")
 ap.add_argument("-k", "--apikey", action="store", dest="api_key",
-                help=f"specify the API key.")
+                help=f"specify the API key with the prefix of either 'file:' or 'key:'.")
 ap.add_argument("-c", "--config", action="store", dest="config",
                 help=f"specify the config filename.")
 opt = ap.parse_args()
