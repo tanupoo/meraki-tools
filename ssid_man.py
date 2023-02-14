@@ -4,7 +4,7 @@ import argparse
 from ssid_switch import get_ssid_status, update_ssid_status, set_conf_apikey
 
 """
-ssid_man.py -c config.json -k file:meraki-apikey.txt
+ssid_man.py config.json -k file:meraki-apikey.txt
 """
 
 def print_ssid_status(result):
@@ -27,12 +27,10 @@ ap.add_argument("-a", "--show-all-status", action="store_true", dest="show_all_s
                 help=f"show current status of all APs")
 ap.add_argument("-k", "--apikey", action="store", dest="api_key",
                 help=f"specify the API key with the prefix of either 'file:' or 'key:'.")
-ap.add_argument("-c", "--config", action="store", dest="config",
+ap.add_argument("config",
                 help=f"specify the config filename.")
 opt = ap.parse_args()
 
-if opt.config is None:
-    raise ValueError("config must be specified.")
 if opt.api_key is None:
     raise ValueError("api key must be specified.")
 if opt.show_all_status:
