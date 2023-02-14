@@ -1,11 +1,27 @@
 #!/usr/bin/env python
 
 import argparse
-from ssid_switch import get_ssid_status, update_ssid_status, set_conf_apikey
+from meraki_api import meraki_put_ssid, meraki_get_ssid, meraki_set_apikey
+import json
 
 """
 ssid_man.py config.json -k file:meraki-apikey.txt
 """
+
+def get_ssid_status(ssid_name, target):
+    return meraki_get_ssid(target["network_id"], target["ssid_number"])
+
+def update_ssid_status(ssid_name, target, status):
+    if status == "up":
+        data = { "enabled": True }
+    elif status == "down":
+        data = { "enabled": False }
+    else:
+        raise RuntimeError
+    return meraki_put_ssid(target["network_id"], target["ssid_number"], data)
+
+def get_conf(config: str) -> dict:
+    return json.loads(open(config).read())
 
 def print_ssid_status(result):
     if result:
@@ -31,15 +47,15 @@ ap.add_argument("config",
                 help=f"specify the config filename.")
 opt = ap.parse_args()
 
-if opt.api_key is None:
-    raise ValueError("api key must be specified.")
 if opt.show_all_status:
-    ssid_info = set_conf_apikey(opt.config, opt.api_key)
+    ssid_info = get_conf(opt.config)
+    meraki_set_apikey(opt.api_key)
     for ssid,v in ssid_info.items():
         ret = get_ssid_status(ssid, v)
         print_ssid_status(ret)
 elif opt.ssid:
-    ssid_info = set_conf_apikey(opt.config, opt.api_key)
+    ssid_info = get_conf(opt.config)
+    meraki_set_apikey(opt.api_key)
     if opt.status:
         ret = update_ssid_status(opt.ssid, ssid_info[opt.ssid], opt.status)
     else:
