@@ -1,5 +1,6 @@
 import requests
 import json
+from os import environ
 
 base_url = "https://api.meraki.com"
 base_api = "{base_url}/api/v1".format(base_url=base_url)
