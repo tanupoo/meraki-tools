@@ -80,12 +80,15 @@ def meraki_sensors_get_metric(network_id):
     api_epr = f"/networks/{network_id}/sensor/alerts/current/overview/byMetric"
     return do_request("GET", api_epr)
 
-def meraki_set_apikey(api_key_spec: Optional[str], config: Optional[str]) -> None:
+def meraki_set_apikey(
+        api_key_spec: str=None,
+        config_api_key_spec: str=None
+        ) -> None:
     """
     Priority:
         1. api_key_spec
         2. environmental variable
-        3. config
+        3. config_api_key_spec
     """
     def set_apikey(spec):
         if spec.startswith("key:"):
@@ -102,9 +105,8 @@ def meraki_set_apikey(api_key_spec: Optional[str], config: Optional[str]) -> Non
         if environ.get("MERAKI_API_KEY"):
             pass
         else: 
-            api_key_spec = config.get("api_key_spec")
-            if api_key_spec:
-                set_apikey(api_key_spec)
+            if config_api_key_spec:
+                set_apikey(config_api_key_spec)
             else:
                 raise ValueError("ERROR: APIKEY must be set.")
 
