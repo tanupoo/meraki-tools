@@ -8,20 +8,16 @@ import json
 ssid_man.py config.json -k file:meraki-apikey.txt
 """
 
-def get_ssid_status(ssid_name, target):
-    return meraki_get_ssid(target["network_id"], target["ssid_number"])
-
-def update_ssid_status(ssid_name, target, status):
-    if status == "up":
-        data = { "enabled": True }
-    elif status == "down":
-        data = { "enabled": False }
-    else:
-        raise RuntimeError
-    return meraki_put_ssid(target["network_id"], target["ssid_number"], data)
-
 def get_conf(config: str) -> dict:
     return json.loads(open(config).read())
+
+def get_ssid_spec(ssid_list, ssid_name):
+    for x in ssid_list:
+        if x["ssid_name"] == ssid_name:
+            return x
+    else:
+        print(f"ERROR: unknown SSID: {ssid_name}")
+        exit(1)
 
 def print_ssid_status(result):
     if result:
@@ -47,19 +43,34 @@ ap.add_argument("config",
                 help=f"specify the config filename.")
 opt = ap.parse_args()
 
+config = get_conf(opt.config)
+ssid_list = config.get("ssid_list")
+if ssid_list is None:
+    print("ERROR: ssid_list must be defined.")
+    exit(1)
+
 if opt.show_all_status:
-    ssid_info = get_conf(opt.config)
-    meraki_set_apikey(opt.api_key)
-    for ssid,v in ssid_info.items():
-        ret = get_ssid_status(ssid, v)
+    meraki_set_apikey(api_key_spec=opt.api_key,
+                      config_api_key_spec=config.get("api_key_spec"))
+    for x in ssid_list:
+        ret = meraki_get_ssid(x["network_id"], x["ssid_number"])
         print_ssid_status(ret)
 elif opt.ssid:
-    ssid_info = get_conf(opt.config)
-    meraki_set_apikey(opt.api_key)
+    meraki_set_apikey(api_key_spec=opt.api_key,
+                      config_api_key_spec=config.get("api_key_spec"))
+    ssid_spec = get_ssid_spec(ssid_list, opt.ssid)
     if opt.status:
-        ret = update_ssid_status(opt.ssid, ssid_info[opt.ssid], opt.status)
+        if opt.status == "up":
+            data = { "enabled": True }
+        elif opt.status == "down":
+            data = { "enabled": False }
+        else:
+            raise RuntimeError
+        ret = meraki_put_ssid(ssid_spec["network_id"], ssid_spec["ssid_number"], data)
+        print(f"enabled: {ret.get('enabled')}")
     else:
-        ret = get_ssid_status(ssid, ssid_info[opt.ssid])
+        ret = meraki_get_ssid(ssid_spec["network_id"], ssid_spec["ssid_number"])
         print_ssid_status(ret)
 else:
     ap.print_help()
+
