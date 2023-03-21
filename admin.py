@@ -17,6 +17,8 @@ ap.add_argument("--get-networks", action="store_true", dest="get_networks",
                 help="specify to get a list of networks.")
 ap.add_argument("--get-ssids", action="store_true", dest="get_ssids",
                 help="specify to get a list of SSIDs.")
+ap.add_argument("--get-sensors", action="store_true", dest="get_sensors",
+                help="specify to get a list of sensors.")
 ap.add_argument("--org-id", "-O", action="store", dest="org_id",
                 help="specify the network ID.")
 ap.add_argument("--network-id", "-N", action="store", dest="network_id",
@@ -54,6 +56,14 @@ elif opt.get_ssids:
             print(f"## name:{a['name']} enabled:{a['enabled']}")
             print(a)
             print()
+    else:
+        print("ERROR: specify the network id")
+        exit(1)
+elif opt.get_ssids:
+    if opt.network_id:
+        meraki_set_apikey(api_key_spec=opt.api_key, config=config)
+        ret = meraki_sensors_get_metric(opt.network_id)
+        print(ret)
     else:
         print("ERROR: specify the network id")
         exit(1)
