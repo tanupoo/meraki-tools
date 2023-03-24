@@ -58,29 +58,29 @@ class meraki_api:
                 print("--- done ---")
             return []
 
-    def get_all_orgs(self) -> List:
+    def get_all_orgs(self, debug=False) -> List:
         api_epr = f"/organizations"
-        return self.do_request("GET", api_epr)
+        return self.do_request("GET", api_epr, debug=debug)
 
-    def get_all_networks(self, org_id):
+    def get_all_networks(self, org_id, debug=False):
         api_epr = f"/organizations/{org_id}/networks"
-        return self.do_request("GET", api_epr)
+        return self.do_request("GET", api_epr, debug=debug)
 
-    def get_all_ssids(self, network_id):
+    def get_all_ssids(self, network_id, debug=False):
         api_epr = f"/networks/{network_id}/wireless/ssids"
-        return self.do_request("GET", api_epr)
+        return self.do_request("GET", api_epr, debug=debug)
 
-    def put_ssid(self, network_id, ssid_number, data):
+    def put_ssid(self, network_id, ssid_number, data, debug=False):
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-        return self.do_request("PUT", api_epr, data)
+        return self.do_request("PUT", api_epr, data, debug=debug)
 
-    def get_ssid(self, network_id, ssid_number):
+    def get_ssid(self, network_id, ssid_number, debug=False):
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-        return self.do_request("GET", api_epr)
+        return self.do_request("GET", api_epr, debug=debug)
 
-    def sensors_get_metric(self, network_id):
+    def sensors_get_metric(self, network_id, debug=False):
         api_epr = f"/networks/{network_id}/sensor/alerts/current/overview/byMetric"
-        return self.do_request("GET", api_epr)
+        return self.do_request("GET", api_epr, debug=debug)
 
     def set_apikey(self,
             api_key_spec: str=None,
