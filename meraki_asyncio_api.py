@@ -9,7 +9,7 @@ base_api = "{base_url}/api/v1".format(base_url=base_url)
 
 class meraki_asyncio_api:
 
-    def __init__(self, loop):
+    def __init__(self, loop=None):
         self.loop = loop
         self.api_key = None
 
@@ -85,9 +85,14 @@ class meraki_asyncio_api:
         if data:
             headers.update({"Content-Type": "application/json"})
             payload = json.dumps(data)
-        task = self.loop.create_task(self._async_do(method, url, headers, payload, debug))
-        result = self.loop.run_until_complete(task)
-        return result
+        #
+        if self.loop:
+            pass
+        else:
+            self.loop = asyncio.new_event_loop()
+            task = self.loop.create_task(self._async_do(method, url, headers, payload, debug))
+            result = self.loop.run_until_complete(task)
+            return result
 
     def get_all_orgs(self, debug=False) -> List:
         api_epr = f"/organizations"
