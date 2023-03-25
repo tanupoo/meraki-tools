@@ -8,8 +8,9 @@ base_api = "{base_url}/api/v1".format(base_url=base_url)
 
 class meraki_api:
 
-    def __init__(self):
+    def __init__(self, debug=False):
         self.api_key = None
+        self.debug = debug
 
     def do_request(self,
                    method: str,
