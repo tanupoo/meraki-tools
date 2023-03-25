@@ -33,14 +33,13 @@ ap.add_argument("config",
 opt = ap.parse_args()
 
 config = get_conf(opt.config)
+
 if opt.non_async:
     from meraki_api import meraki_api
-    meraki = meraki_api()
 else:
-    from meraki_asyncio_api import meraki_asyncio_api
-    from asyncio import new_event_loop
-    meraki = meraki_asyncio_api(new_event_loop())
+    from meraki_asyncio_api import meraki_asyncio_api as meraki_api
 
+meraki = meraki_api()
 meraki.set_apikey(api_key_spec=opt.api_key,
                   config_api_key_spec=config["api_key_spec"])
 

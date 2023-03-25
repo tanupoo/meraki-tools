@@ -69,34 +69,49 @@ class meraki_asyncio_api:
                 print("--- done ---")
             return []
 
-    def do_request(self,
-                   method: str,
-                   api_epr: str,
-                   data: dict=None,
-                   debug: bool=False
-                   ) -> dict:
+    def _pre_proc(self, api_epr, data, debug):
         if self.api_key is None:
             raise ValueError("api_key must be specified.")
         # url and headers
         url = f"{base_api}/{api_epr}"
+        # headers
         headers = { "X-Cisco-Meraki-API-Key": f"{self.api_key}" }
         # payload
         payload = None
         if data:
             headers.update({"Content-Type": "application/json"})
             payload = json.dumps(data)
-        #
-        if self.loop:
-            pass
-        else:
-            self.loop = asyncio.new_event_loop()
-            task = self.loop.create_task(self._async_do(method, url, headers, payload, debug))
-            result = self.loop.run_until_complete(task)
-            return result
+        return url, headers, payload
+
+    def do_request(self,
+                   method: str,
+                   api_epr: str,
+                   data: dict=None,
+                   debug: bool=False
+                   ) -> dict:
+        url, headers, payload = self._pre_proc(api_epr, data, debug)
+        self.loop = asyncio.new_event_loop()
+        task = self.loop.create_task(self._async_do(method, url, headers, payload, debug))
+        result = self.loop.run_until_complete(task)
+        return result
+
+    async def async_do_request(self,
+                   method: str,
+                   api_epr: str,
+                   data: dict=None,
+                   debug: bool=False
+                   ) -> dict:
+        url, headers, payload = self._pre_proc(api_epr, data, debug)
+        result = await self._async_do(method, url, headers, payload, debug)
+        return result
 
     def get_all_orgs(self, debug=False) -> List:
         api_epr = f"/organizations"
         return self.do_request("GET", api_epr, debug=debug)
+
+    async def asyncio_get_all_orgs(self, debug=False) -> List:
+        api_epr = f"/organizations"
+        return await self.async_do_request("GET", api_epr, debug=debug)
 
     def get_all_networks(self, org_id, debug=False):
         api_epr = f"/organizations/{org_id}/networks"
@@ -110,9 +125,17 @@ class meraki_asyncio_api:
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
         return self.do_request("PUT", api_epr, data, debug=debug)
 
+    async def async_put_ssid(self, network_id, ssid_number, data, debug=False):
+        api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
+        return await self.async_do_request("PUT", api_epr, data, debug=debug)
+
     def get_ssid(self, network_id, ssid_number, debug=False):
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
         return self.do_request("GET", api_epr, debug=debug)
+
+    async def async_get_ssid(self, network_id, ssid_number, debug=False):
+        api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
+        return await self.async_do_request("GET", api_epr, debug=debug)
 
     def sensors_get_metric(self, network_id, debug=False):
         api_epr = f"/networks/{network_id}/sensor/alerts/current/overview/byMetric"
