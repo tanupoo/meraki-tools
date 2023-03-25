@@ -39,7 +39,7 @@ if opt.non_async:
 else:
     from meraki_asyncio_api import meraki_asyncio_api as meraki_api
 
-meraki = meraki_api()
+meraki = meraki_api(debug=opt.debug)
 meraki.set_apikey(api_key_spec=opt.api_key,
                   config_api_key_spec=config["api_key_spec"])
 
