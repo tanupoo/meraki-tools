@@ -44,14 +44,14 @@ meraki.set_apikey(api_key_spec=opt.api_key,
                   config_api_key_spec=config["api_key_spec"])
 
 if opt.get_orgs:
-    ret = meraki.get_all_orgs(debug=opt.debug)
+    ret = meraki.get_all_orgs()
     for a in ret:
         print(f"## name:{a['name']} id:{a['id']}")
         print(a)
         print()
 elif opt.get_networks:
     if opt.org_id:
-        ret = meraki.get_all_networks(opt.org_id, debug=opt.debug)
+        ret = meraki.get_all_networks(opt.org_id)
         for a in ret:
             print(f"## name:{a['name']} id:{a['id']}")
             print(a)
@@ -61,7 +61,7 @@ elif opt.get_networks:
         exit(1)
 elif opt.get_ssids:
     if opt.network_id:
-        ret = meraki.get_all_ssids(opt.network_id, debug=opt.debug)
+        ret = meraki.get_all_ssids(opt.network_id)
         for a in ret:
             print(f"## name:{a['name']} enabled:{a['enabled']}")
             print(a)
@@ -71,7 +71,7 @@ elif opt.get_ssids:
         exit(1)
 elif opt.get_sensors:
     if opt.network_id:
-        ret = meraki.sensors_get_metric(opt.network_id, debug=opt.debug)
+        ret = meraki.sensors_get_metric(opt.network_id)
         print(ret)
     else:
         print("ERROR: specify the network id")

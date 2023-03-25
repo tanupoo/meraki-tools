@@ -15,8 +15,7 @@ class meraki_api:
     def do_request(self,
                    method: str,
                    api_epr: str,
-                   data: str=None,
-                   debug: bool=False
+                   data: str=None
                    ) -> dict:
         if self.api_key is None:
             raise ValueError("api_key must be specified.")
@@ -28,7 +27,7 @@ class meraki_api:
         if data:
             headers.update({"Content-Type": "application/json"})
             payload = json.dumps(data)
-        if debug:
+        if self.debug:
             print(method, url)
             print("--- header ---")
             print(headers)
@@ -47,41 +46,41 @@ class meraki_api:
             ctype = ret.headers.get("content-type")
             if not ctype.startswith("application/json"):
                 raise ValueError(f"the response is not JSON, but {ctype}")
-            if debug:
+            if self.debug:
                 print("--- response ---")
                 print(f"{ret.json()}")
                 print("--- done ---")
             return ret.json()
         except Exception as e:
-            if debug:
+            if self.debug:
                 print(f"ERROR: {e}")
                 print(f"{ret.text}")
                 print("--- done ---")
             return []
 
-    def get_all_orgs(self, debug=False) -> List:
+    def get_all_orgs(self) -> List:
         api_epr = f"/organizations"
-        return self.do_request("GET", api_epr, debug=debug)
+        return self.do_request("GET", api_epr)
 
-    def get_all_networks(self, org_id, debug=False):
+    def get_all_networks(self, org_id):
         api_epr = f"/organizations/{org_id}/networks"
-        return self.do_request("GET", api_epr, debug=debug)
+        return self.do_request("GET", api_epr)
 
-    def get_all_ssids(self, network_id, debug=False):
+    def get_all_ssids(self, network_id):
         api_epr = f"/networks/{network_id}/wireless/ssids"
-        return self.do_request("GET", api_epr, debug=debug)
+        return self.do_request("GET", api_epr)
 
-    def put_ssid(self, network_id, ssid_number, data, debug=False):
+    def put_ssid(self, network_id, ssid_number, data):
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-        return self.do_request("PUT", api_epr, data, debug=debug)
+        return self.do_request("PUT", api_epr, data)
 
-    def get_ssid(self, network_id, ssid_number, debug=False):
+    def get_ssid(self, network_id, ssid_number):
         api_epr = f"/networks/{network_id}/wireless/ssids/{ssid_number}"
-        return self.do_request("GET", api_epr, debug=debug)
+        return self.do_request("GET", api_epr)
 
-    def sensors_get_metric(self, network_id, debug=False):
+    def sensors_get_metric(self, network_id):
         api_epr = f"/networks/{network_id}/sensor/alerts/current/overview/byMetric"
-        return self.do_request("GET", api_epr, debug=debug)
+        return self.do_request("GET", api_epr)
 
     def set_apikey(self,
             api_key_spec: str=None,
